@@ -1,0 +1,200 @@
+https://code.google.com/archive/schema
+https://storage.googleapis.com/google-code-archive/v2/code.google.com/llvm-lua/source-page-4.json
+https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/llvm-lua/llvm_lua-1.2.0.tar.gz
+
+Schema
+
+The Google Code Archive's data is hosted on Google Cloud Storage. Data is retrieved using the JSON API. Project data is stored across several files and Google Cloud Storage buckets. To access data you generally use the following URL pattern:
+
+https://storage.googleapis.com/gcs-bucket/project-path/file-name
+So for example, to get the project data for the hg4j project (Mercurial API built in Java) use:
+
+gcs-bucket - google-code-archive, which is the bucket where project data is stored.
+project-path - /v2/code.google.com/hg4j, which is the root of the object name within the Google Code Archive. It is always "v2", followed by the domain name (code.google.com, eclipselabs.org, or apache-extras.org), followed by the project name. Use the same project path regardless of which Google Cloud Storage bucket the data are found in.
+file-name - project.json, the name of the file to retrieve
+So the full URL to the project information for the hg4j project is: 
+https://storage.googleapis.com/google-code-archive/v2/code.google.com/hg4j/project.json
+Project Information
+
+Project information is found in the google-code-archive bucket. In that bucket, using the standard project path, you will find several files storing the project's data.
+
+project.json - This file contains all the information about a project, such as its summary, description, and labels. See below.
+wikis.json - This file contains the list of all wiki files associated with the project. See below.
+logo.png - The logo for the project, if a custom logo was uploaded to Google Code. Otherwise this file will not exist.
+issues-page-X.json - Retrieves a page of issues. Each page of issues contains summary, such as an issue's title and labels. A project may have many pages of issues, starting at issues-page-1.json.
+commits-page-X.json - Retrieves a page of source code commits. Each page of commits contain commit summary information. Pages start with commits-page-1.json.
+source-page-X.json - Retrieves a page of source files. This is just a listing of the files in the repo (e.g. their names and sizes). The actual source code itself is obtained elsewhere. Starts with source-page-1.json.
+downloads-page-X.json - Retrieves a page of downloads. Like source pages, this just contains metadata. Starts with downloads-page-1.json.
+Project Information Schemas
+
+The project.json file contains a single JSON object with the following fields:
+
+domain - string. The name of the project's domain, such as "code.google.com".
+name - string. The name of the project, such as "hg4j".
+summary - string. One-line summary of the project, such as "Pure Java API and Toolkit for Mercurial DVCS".
+description - string. Long description of the project. This will be in HTML.
+stars - integer. Number of stars the project has.
+contentLicense - enumerated string. Type of content license. For the exact mapping see below.
+labels - string array. Array of project labels.
+links - {name: string, url: string} array. Array of project links.
+blogs - {name: string, url: string} array. Array of project blogs.
+creationTime - integer. Unix timestamp when the project was created. May be omitted if the project was created before Google Code started adding this dating.
+hasSource - boolean. Whether or not the project has source code associated with it.
+repoType - string. Type of source repository. One of "svn", "hg", or "git".
+subrepos - string array. Array of project sub-repos if applicable.
+ancestorRepo - string. The project's parent if applicable, e.g. if the project is a server-side clone of another.
+logoName - string. Name of the custom logo uploaded to Google Code, if applicable.
+imageUrl - string. URL to the project's logo, if it exists.
+movedTo - string. URL to the project's new location on the internet if it has moved. The Google Code Archive serves a 302 redirect if this field is present.
+The following table maps content license names to their meaning.
+
+Abbreviation	License
+asf20	Apache License 2.0
+art	Artistic License/GPL
+lgpl	GNU Lesser GPL
+gpl2	GNU GPL v2
+gpl3	GNU GPL v3
+bsd	New BSD License
+mit	MIT License
+mpl11	Mozilla Public License 1.1
+epl	Eclipse Public License 1.0
+oos	Other Open Source
+gsoc	See source code
+none	None Specified - Not Open Source
+multiple	Multiple Licenses
+publicdomain	Public domain
+cc3-by	Creative Commons 3.0 BY
+cc3-by-nd	Creative Commons 3.0 BY-SA
+cc25-by	Creative Commons 2.5 BY
+cc25-by-sa	Creative Commons 2.5 BY-SA
+cc3-by-nc-sa	Creative Commons 3.0 BY-NC-SA
+ccpd	Creative Commons Public Domain Dedication
+gfdl	GNU Free Documentation License
+fbsd-doc	FreeBSD Documentation License
+Issues Page
+
+The issues-page-X.json file contains a JSON object with the following fields:
+
+pageNumber - integer. The current page number.
+totalPages - integer. The total number of pages of project issues.
+issues - IssueSummary array. An array of issue summary objects.
+An IssueSummary object contains the following fields:
+
+id - integer. The issue ID.
+status - string. The issue's status. e.g. "Fixed".
+summary - string. Brief summary of the issue.
+labels - string array. Array of the issue's labels.
+stars - integer. The number of stars the issue has.
+commentCount - integer. The number of comments on the issue.
+Commits Page
+
+The commits-page-X.json file contains a JSON object with the following fields:
+
+page - integer. The current page number.
+totalPages - integer. The total number of pages of project commits.
+commits - CommitSummary array. An array of commit objects.
+A CommitSummary object contains the following fields:
+
+author - string. The author of the commit.
+date - string. Date of the commit in ISO 8601 format.
+commit - string. Commit identifier. For SVN this is an integer, for Git and Mercurial this is the commit hash.
+message - string. Message for the commit.
+Source Page
+
+The source-page-X.json file contains a JSON object with the following fields:
+
+page - integer. The current page number.
+totalPages - integer. The total number of pages of project source files.
+uncompressed_size - integer. Size of the repository uncompressed.
+compressed_size - integer. Size of the repository when compressed.
+zip_file_size - integer. Size of the repository zip file.
+num_entries - integer. Number of file entries in the repository. (Including hidden and those for VCS system bookkeeping.)
+entries - SourceEntry array. An array of file entry objects.
+A SourceEntry object contains the following fields. They were abbreviated in order to keep the source-page file sizes small.
+
+f - string. The name of the file.
+s - integer. Size of the file in bytes.
+d - boolean. Whether or not the entry is a directory.
+Downloads Page
+
+The downloads-page-X.json file contains a JSON object with the following fields:
+
+page - integer. The current page number.
+totalPages - integer. The total number of pages of project download files.
+downloads - Download array. An array of download objects.
+A Download object contains the following fields:
+
+filename - string. The name of the file.
+summary - string. Brief summary of the download.
+description - string. Full description of the download.
+labels - string array. Array of the download's labels.
+releaseDate - integer. Unix timestamp of the download's release date.
+fileSize - integer. Download file size in bytes.
+uploadDate - integer. Unix timestamp of the download's upload date.
+sha1Checksum - string. SHA-1 checksum of the file.
+stars - integer. Number of stars the download has.
+Source Archives
+
+Project source archives are found in the google-code-archive-source bucket. If a project has source code associated with it, there will be a file named source-archive.zip, which will contain an archive of the project's source code.
+
+If the project contained multiple source repositories, then other repository archives will be prefixed with the repository name followed by a period. For example, if a subrepo was named "android-client" then the archive name will be android-client.source-archive.zip
+
+The exact list of source repositories a project has can be found in project.json.
+
+Individual Issues
+
+Individual issues for a project are found in the google-code-archive-source bucket, in the /v2/code.google.com/project-name/issues project-path. In that location there will be a file issues-X.json for every project issue, starting with issue-1.json.
+
+The issue-X.json file contains a JSON object with the following fields:
+
+id - integer. The issue's ID.
+status - string. The issue's status, e.g. "WontFix".
+summary - string. Brief summary of the issue.
+labels - string array. Array of the issue's labels.
+stars - integer. The number of stars the issue has.
+commentCount - integer. The total number of comments on the issue.
+comments - Comment array. Array of the issue's comments.
+A Comment object contains the following fields. Note that the first comment is the original issue report.
+
+id - integer. The comment's ID. (i.e. the comment's index.)
+commenterId - integer. Anonymized identifier for the commenter. Each unique commenter on a project will have unique commenterId. However, the commenterId will not be the same across projects. So if page@google.com had commenterId 42 when commenting on project X, they will have a different commenterId when commenting on project Y.
+content - string. The comment's contents.
+timestamp - integer. Unix timestamp of the comment.
+attachments - Attachment array. Array of issue attachments.
+An Attachment object contains the following fields:
+
+id - integer. The attachments ID.
+fileName - string. The issue attachment's file name.
+fileSize - integer. The file size in bytes.
+The issue attachment files are stored on Google Cloud Storage in the google-code-attachments bucket. It uses the following scheme for generating a URL to the issue attachment. Note: Issue attachments are stored with their comments being zero-indexed.
+
+https://storage.googleapis.com/google-code-attachments/project-name/issue-issue-number/comment-comment-number/filename
+So for example, to get the file attachment "TestHgStatusCommand.java" for issue #6 in the hg4j project, you use the following parameters:
+
+project-name - hg4j
+issue-id - 6
+comment-number - 0
+filename - TestHgStatusCommand.java
+So the full URL to the file attachment would be: 
+https://storage.googleapis.com/google-code-attachments/hg4j/issue-6/comment-0/TestHgStatusCommand.java
+Project Wikis
+
+Wiki files are found in the google-code-archive bucket in the /v2/code.google.com/project-name/wikis project-path. Every file listed in wikis.json will be at that location.
+
+The wikis.json file contains a JSON object with the following fields:
+
+WikiFiles - string array. An array of file paths relative to the location where wikis are stored. For example "/getting-started.wiki" or "/images/success.png".
+The wiki file contents are stored in a closed-source Google Code wiki format, documented here. To convert these files to an open-format, use the Wiki-to-MarkDown tool.
+
+Project Downloads
+
+Wiki files are round in the google-code-archive-downloads bucket. The exact downloads associated with a project are found in the downloads-page-X.json files. With the download file name to the following URL. (Just like accessing other files like wikis.)
+
+https://storage.googleapis.com/google-code-archive-downloads/project-path/file-name
+So for example, to get v1.1 download for the hg4j project you use:
+
+project-path - /v2/code.google.com/hg4j.
+file-name - hg4j_1.1.jar.
+So the full URL to the project information for the hg4j project is: 
+https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/hg4j/hg4j_1.1.jar
+
