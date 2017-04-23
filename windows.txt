@@ -1,0 +1,43 @@
+http://weimingtom.iteye.com/blog/946180
+
+在Windows下编译运行llvm-lua
+
+1. 编译llvm-lua
+http://code.google.com/p/llvm-lua/
+注意，
+1)编译时可能需要修改源代码以适应VC2008。
+2)需要编译LLVM（http://llvm.org/releases/download.html#2.7）
+3)对于VC2008，需要把所有lua脚本引擎核心使用过的API和常数都在exe中导出，好像dll那样（尤其是lua的OP码），否则会有运行期错误。（怀疑是因为llvm-lua在内存中动态生成脚本对应的汇编代码，但没有动态生成lua脚本引擎的代码，而是与llvm-lua.exe共享这些API）
+ 
+我的编译版本见下（对应llvm 2.7，但不含LLVM 2.7的编译器），仅测试用：
+svn://www.svnhost.cn/weimingtom_mmcstudy/llvm-lua
+ 
+2. 使用llvm-lua运行
+ 
+ 
+C:\Documents and Settings\Administrator\桌面\llvm_lua-1.2.0_vc9_bin\bin>llvm-lua test\hello.lua
+Hello world, from Lua 5.1!
+ 
+ 
+3. 用LLVM自带的lli工具JIT运行LLVM的bc码文件（不使用llvm-lua）
+ 
+ 
+D:\java\LLVM\bin>lli luac.out
+Hello world, from Lua 5.1
+ 
+ 
+这里运行结果和上面不一样可能是因为llvm的版本不同。
+ 
+4. 编译lua脚本为LLVM的bc码文件
+ 
+C:\Documents and Settings\Administrator\桌面\llvm_lua-1.2.0_vc9_bin\bin>llvm-luac -bc test\hello.lua
+ 
+ 
+5. 反编译LLVM的bc码文件为汇编源代码（intel格式）
+ 
+ 
+D:\java\LLVM\bin>llc -O0 -asm-verbose -x86-asm-syntax=intel luac.out -o lua.out.s
+ 
+6. 其它问题：
+用lli.exe明显比llvm-lua.exe要慢。
+有待继续研究如何把lua脚本文件直接编译成exe，以及llvm-lua的内部运行机制。
